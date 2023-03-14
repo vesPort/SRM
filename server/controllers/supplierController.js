@@ -74,3 +74,88 @@ export const renameSupplier = async (req, res) => {
     console.log(error, "Cannot rename supplier");
   }
 };
+
+export const setPrice = async (req, res) => {
+  const { id, itemId } = req.params;
+  const { price } = req.body;
+
+  const supplier = await SupplierModel.findById(id);
+  console.log(supplier);
+
+  let item = supplier.items.reduce((item) => item._id === itemId);
+  console.log(item);
+
+  const newItem = new ItemModel({
+    name: item.name,
+    price: price,
+  });
+
+  supplier.items.splice(supplier.items.indexOf(item), 1);
+
+  await SupplierModel.findByIdAndUpdate(id, {
+    name: supplier.name,
+    items: supplier.items.concat(newItem),
+  });
+  res.json({
+    newItem,
+    supplier,
+  });
+};
+
+export const setOrder = async (req, res) => {
+  const { id, itemId } = req.params;
+  const { order } = req.body;
+
+  const supplier = await SupplierModel.findById(id);
+  console.log(supplier);
+
+  let item = supplier.items.reduce((item) => item._id === itemId);
+  console.log(item);
+
+  const newItem = new ItemModel({
+    name: item.name,
+    price: item.price,
+    order,
+  });
+
+  supplier.items.splice(supplier.items.indexOf(item), 1);
+
+  await SupplierModel.findByIdAndUpdate(id, {
+    name: supplier.name,
+    items: supplier.items.concat(newItem),
+  });
+  res.json({
+    newItem,
+    supplier,
+  });
+};
+
+export const setDone = async (req, res) => {
+  const { id, itemId } = req.params;
+  const { done } = req.body;
+
+  const supplier = await SupplierModel.findById(id);
+  console.log(supplier);
+
+  let item = supplier.items.reduce((item) => item._id === itemId);
+  console.log(item);
+
+  const newItem = new ItemModel({
+    name: item.name,
+    price: item.price,
+    order: item.order,
+    done,
+    remaining: item.order - done,
+  });
+
+  supplier.items.splice(supplier.items.indexOf(item), 1);
+
+  await SupplierModel.findByIdAndUpdate(id, {
+    name: supplier.name,
+    items: supplier.items.concat(newItem),
+  });
+  res.json({
+    newItem,
+    supplier,
+  });
+};

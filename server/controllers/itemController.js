@@ -67,7 +67,6 @@ export const deleteItem = async (req, res) => {
     while (i != suppliers.length) {
       const supplierItems = suppliers[i].items;
       supplierItems.splice(supplierItems.indexOf(item), 1);
-      console.log(updatedItems);
 
       await SupplierModel.findOneAndReplace(
         { name: suppliers[i].name },
