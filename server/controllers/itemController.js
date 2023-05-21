@@ -84,3 +84,9 @@ export const deleteItem = async (req, res) => {
     console.log("Cannot delete item", error);
   }
 };
+
+// export const setPrice = async (req, res) => {
+//   try {
+//     const 
+//   }
+// }
