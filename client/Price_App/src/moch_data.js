@@ -2,6 +2,8 @@ const data = [
   {
     position: "Tomatoes - Heirloom",
     agro: "$123.71",
+    agroZ: 0,
+    agroD: 0,
     kur: "$65.25",
   },
   {

@@ -60,8 +60,12 @@ const state = proxy({
       ],
     },
   ],
-  data,
+  data: [],
   addingSupplier: false,
+  addingPosition: false,
+  suppliers: [
+    { header: "Позиции", accessorKey: "position" },
+  ],
 });
 
 export default state;

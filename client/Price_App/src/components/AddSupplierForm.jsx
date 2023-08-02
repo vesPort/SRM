@@ -1,10 +1,30 @@
 import { Button, TextField } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import state from "../store";
 
 const AddSupplierForm = () => {
-  const handleSubmit = () => {
+  const [newSupplier, setNewSupplier] = useState("");
 
+  const handleSubmit = async () => {
+    const accessorKey = newSupplier.toLowerCase();
+    await state.suppliers.push({
+      header: newSupplier,
+      accessorKey: accessorKey,
+    });
+    await state.suppliers.push({
+      header: newSupplier + " З",
+      accessorKey: accessorKey + "Z",
+    });
+    await state.suppliers.push({
+      header: newSupplier + " В",
+      accessorKey: accessorKey + "D",
+    });
+
+    await state.data.map((item) => {
+      item[`${accessorKey}`] = 0;
+      item[`${accessorKey}Z`] = 0;
+      item[`${accessorKey}D`] = 0;
+    });
     state.addingSupplier = false;
   };
 
@@ -14,14 +34,19 @@ const AddSupplierForm = () => {
       <TextField
         label={"Имя"}
         size="small"
-        sx={{ marginTop: 3, borderColor: "black" }}
+        color="success"
+        sx={{ marginTop: 3, borderColor: "black", }}
+        onChange={() => setNewSupplier(event.target.value)}
       ></TextField>
       <div className="flex mt-10 justify-center">
         <Button
           sx={{
             color: "gray",
             bgcolor: "white",
-            ":hover": { bgcolor: "gray", color: "white" },
+            ":hover": {
+              background: "linear-gradient(to right bottom , #12ed0e, #4697e8)",
+              color: "white",
+            },
           }}
           variant="contained"
           onClick={handleSubmit}
