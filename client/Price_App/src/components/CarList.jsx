@@ -3,6 +3,7 @@ import { useSnapshot } from "valtio";
 import state from "../store";
 import CarCard from "./CarCard";
 import { Button } from "@mui/material";
+import { CreateCar } from "../components/index";
 
 const CarList = () => {
   const snap = useSnapshot(state);
@@ -27,6 +28,9 @@ const CarList = () => {
         >
           Сформировать машину
         </Button>
+      </div>
+      <div className="flex justify-center">
+        <CreateCar />
       </div>
       {carList.map((car) => (
         <CarCard

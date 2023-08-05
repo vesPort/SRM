@@ -25,37 +25,7 @@ const state = proxy({
       summary: 7000,
       weight: 5000,
       items: [
-        { id: 1, name: "Oкорок", price: 88, quantity: 574 },
-        { id: 2, name: "Грудка", price: 150, quantity: 500 },
-      ],
-    },
-    {
-      id: 3,
-      destination: "Dnepr",
-      summary: 7000,
-      weight: 5000,
-      items: [
-        { id: 1, name: "Oкорок", price: 88, quantity: 574 },
-        { id: 2, name: "Грудка", price: 150, quantity: 500 },
-      ],
-    },
-    {
-      id: 4,
-      destination: "Dnepr",
-      summary: 7000,
-      weight: 5000,
-      items: [
-        { id: 1, name: "Oкорок", price: 88, quantity: 574 },
-        { id: 2, name: "Грудка", price: 150, quantity: 500 },
-      ],
-    },
-    {
-      id: 5,
-      destination: "Dnepr",
-      summary: 7000,
-      weight: 5000,
-      items: [
-        { id: 1, name: "Oкорок", price: 88, quantity: 574 },
+        { id: 1, name: "Oкорок", price: 21, quantity: 574 },
         { id: 2, name: "Грудка", price: 150, quantity: 500 },
       ],
     },
