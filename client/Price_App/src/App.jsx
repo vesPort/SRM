@@ -1,4 +1,4 @@
-import { CarCard, CarList, Table } from "./components";
+import { CarList, Table } from "./components";
 
 function App() {
   return (

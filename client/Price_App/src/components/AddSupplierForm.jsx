@@ -1,31 +1,41 @@
 import { Button, TextField } from "@mui/material";
 import React, { useState } from "react";
+import axios from "axios";
 import state from "../store";
 
-const AddSupplierForm = () => {
+const AddSupplierForm = ({ updateTable }) => {
   const [newSupplier, setNewSupplier] = useState("");
 
   const handleSubmit = async () => {
     const accessorKey = newSupplier.toLowerCase();
-    await state.suppliers.push({
+
+    state.suppliers.push({
       header: newSupplier,
       accessorKey: accessorKey,
     });
-    await state.suppliers.push({
+    state.suppliers.push({
       header: newSupplier + " З",
       accessorKey: accessorKey + "Z",
     });
-    await state.suppliers.push({
+    state.suppliers.push({
       header: newSupplier + " В",
       accessorKey: accessorKey + "D",
     });
-
-    await state.data.map((item) => {
+    state.data.map((item) => {
       item[`${accessorKey}`] = 0;
       item[`${accessorKey}Z`] = 0;
       item[`${accessorKey}D`] = 0;
     });
+
+    const databaseSupplier = { header: newSupplier };
+
+    await axios.post(
+      `${state.baseUrl}/${state.id}/addSupplier`,
+      databaseSupplier
+    );
     state.addingSupplier = false;
+    setNewSupplier("");
+    updateTable();
   };
 
   return (
@@ -35,7 +45,7 @@ const AddSupplierForm = () => {
         label={"Имя"}
         size="small"
         color="success"
-        sx={{ marginTop: 3, borderColor: "black", }}
+        sx={{ marginTop: 3, borderColor: "black" }}
         onChange={() => setNewSupplier(event.target.value)}
       ></TextField>
       <div className="flex mt-10 justify-center">

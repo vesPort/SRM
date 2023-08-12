@@ -2,23 +2,26 @@ import React, { useState } from "react";
 import { TextField, Button } from "@mui/material";
 import state from "../store";
 import { useSnapshot } from "valtio";
+import axios from "axios";
 
-const AddPosition = () => {
+const AddPosition = ({ updateTable }) => {
   const snap = useSnapshot(state);
   const [newPosition, setNewPosition] = useState("");
 
   const handleSubmit = async () => {
     // await state.data.push({ position: newPosition, state.su });
-
     const position = { position: newPosition };
     state.suppliers.forEach((supplier) => {
       if (supplier.accessorKey !== "position")
         position[`${supplier.accessorKey}`] = 0;
     });
-
     state.data.push(position);
+    await axios.post(`${snap.baseUrl}/data/${snap.id}/addPosition`, position);
+
+    updateTable();
 
     state.addingPosition = false;
+    setNewPosition("");
   };
 
   return (
@@ -28,8 +31,9 @@ const AddPosition = () => {
         label={"Имя"}
         size="small"
         color="success"
-        sx={{ marginTop: 3, borderColor: "black",}}
+        sx={{ marginTop: 3, borderColor: "black" }}
         onChange={() => setNewPosition(event.target.value)}
+        onSubmit={() => setNewPosition(event.target.value)}
       ></TextField>
       <div className="flex mt-10 justify-center">
         <Button

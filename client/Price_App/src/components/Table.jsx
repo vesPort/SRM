@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MaterialReactTable } from "material-react-table";
 import { AddSupplierForm } from "../components/index";
 
@@ -7,12 +7,44 @@ import state from "../store";
 import { Button } from "@mui/material";
 import AddPosition from "./AddPosition";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import axios from "axios";
 
 const Table = () => {
   const snap = useSnapshot(state);
-  const [tableData, setTableData] = useState(state.data);
+  const [tableData, setTableData] = useState(snap.data);
+  const [addingPosition, setAddingPosition] = useState(false);
+  const [suppliers, setSuppliers] = useState([]);
+  const [forceUpdateSupplier, setForceUpdateSupplier] = useState(false);
+  const [forceUpdatePosition, setForceUpdatePosition] = useState(false);
 
-  const suppliers = state.suppliers;
+  // const suppliers = state.suppliers;
+  // console.log({suppliers})
+  const handleUpdateTableSupplier = () => {
+    setForceUpdateSupplier(!forceUpdateSupplier);
+  };
+
+  const handleUpdateTablePosition = () => {
+    setForceUpdatePosition(!forceUpdatePosition);
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const dataResponse = await axios.get(`${snap.baseUrl}/data/${snap.id}`);
+      const suppliersResponce = await axios.get(
+        `${snap.baseUrl}/${snap.id}/getSuppliers`
+      );
+
+      state.data = dataResponse.data;
+      state.suppliers = suppliersResponce.data;
+
+      setTableData(dataResponse.data);
+      setSuppliers(suppliersResponce.data);
+    };
+
+    console.log("sup lag");
+
+    fetchData();
+  }, [forceUpdateSupplier, forceUpdatePosition]);
 
   const handleSaveCell = (cell, value) => {
     state.data[cell.row.index][cell.column.id] = value;
@@ -32,12 +64,12 @@ const Table = () => {
       <div className="flex justify-around">
         {snap.addingSupplier && (
           <div className="flex justify-center mt-60 border-solid border-2 border-gray-700 bg-gradient-to-r from-gray-200 to-gray-600 text-black m-3 rounded-md  max-w-lg w-2/3">
-            <AddSupplierForm />
+            <AddSupplierForm updateTable={handleUpdateTableSupplier} />
           </div>
         )}
         {snap.addingPosition && (
           <div className="flex justify-center mt-60 border-solid border-2 border-gray-700 bg-gradient-to-r from-gray-200 to-gray-600 text-white m-3 rounded-md max-w-lg w-2/3">
-            <AddPosition />
+            <AddPosition updateTable={handleUpdateTablePosition} />
           </div>
         )}
       </div>
@@ -77,7 +109,10 @@ const Table = () => {
                   },
                 }}
                 variant="contained"
-                onClick={() => (state.addingPosition = true)}
+                onClick={() => {
+                  setAddingPosition(true);
+                  state.addingPosition = true;
+                }}
               >
                 Добавить позицию
               </Button>
