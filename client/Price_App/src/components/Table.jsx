@@ -46,9 +46,20 @@ const Table = () => {
     fetchData();
   }, [forceUpdateSupplier, forceUpdatePosition]);
 
-  const handleSaveCell = (cell, value) => {
+  const handleSaveCell = async (cell, value) => {
     state.data[cell.row.index][cell.column.id] = value;
     setTableData([...state.data]);
+
+    const setPriceToCell = {
+      index: cell.row.index,
+      id: cell.column.id,
+      value: value,
+    };
+
+    await axios.post(
+      `${snap.baseUrl}/data/${snap.id}/setPrice`,
+      setPriceToCell
+    );
     // setTableData(tableData[cell.row.index][cell.column.id] = value);
     //send/receive api updates here
   };

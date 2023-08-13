@@ -5,17 +5,13 @@ import state from "../store";
 import { useSnapshot } from "valtio";
 import axios from "axios";
 
-const CreateCar = () => {
+const CreateCar = ({ updateCarList }) => {
   const snap = useSnapshot(state);
 
   const [isCreating, setIsCreating] = useState(false);
 
   const [supplier, setSupplier] = useState({ name: "" });
-  const [selectValue, setSelectValue] = useState({
-    position: "",
-    price: 0,
-    name: "",
-  });
+  const [selectValue, setSelectValue] = useState("");
   const [weight, setWeight] = useState("");
   const [destination, setDestination] = useState("");
   const [summary, setSummary] = useState(0);
@@ -23,8 +19,8 @@ const CreateCar = () => {
   const [items, setItems] = useState([
     {
       id: 0,
-      position: "Позиция",
-      name: "Поставщик",
+      item: "Позиция",
+      supplier: "Поставщик",
       price: "Цена",
       quantity: "Вес",
     },
@@ -37,7 +33,10 @@ const CreateCar = () => {
   //   });
 
   const positions = snap.data.map((item) => {
-    return { position: item.position, price: item[`${supplier.name}`] };
+    return {
+      position: item.position,
+      price: item[`${supplier.name.toLowerCase()}`],
+    };
   });
 
   const handleFirstSelected = (evt) => {
@@ -45,33 +44,31 @@ const CreateCar = () => {
   };
 
   const handleSecondSelected = (evt) => {
-    setSelectValue({ name: evt.target.value });
+    setSelectValue(evt.target.value);
     console.log(selectValue);
   };
 
   const handleAddItem = (id, name, supplier, quantity) => {
-    // setItems(
-    //   ...items,
-    //   ...[{ id, supplier, name: name, price: price, quantity: quantity }]
-    // );
-    // console.log(items);
     const newObj = {
       id,
-      position: supplier,
-      name: name.name.charAt(0).toUpperCase() + name.name.slice(1),
-      price: snap.data
-        .map((item) => {
-          if (item.position === supplier) {
-            setSummary(
-              summary + parseFloat(item[`${name.name}`]) * parseFloat(quantity)
-            );
-            return item[`${name.name}`];
-          }
-        })
-        .toString()
-        .replace(/[,a-zA-Z]/g, ""),
+      position: selectValue,
+      supplier: name.name.charAt(0).toUpperCase() + name.name.slice(1),
+      price: positions.find((item) => item.position === selectValue).price,
+      // price: positions
+      //   .map((item) => {
+      //     if (item.position === selectValue) {
+      //       return item.price;
+      //     }
+      //   })
+      //   .toString()
+      //   .replace(/[,a-zA-Z]/g, ""),
       quantity: quantity,
     };
+
+    setSummary(
+      summary +
+        positions.find((item) => item.position === selectValue).price * quantity
+    );
 
     setSummWeight(summWeight + parseFloat(quantity));
 
@@ -119,6 +116,7 @@ const CreateCar = () => {
     setWeight(0);
     setSelectValue({ name: "", price: 0 });
     setSupplier({ name: "" });
+    updateCarList();
   };
 
   return (
@@ -130,11 +128,11 @@ const CreateCar = () => {
               <div>
                 {destination.length > 2 ? destination + " :" : "Направление :"}
               </div>
-              <div>{summWeight}</div>
+              <div>{summWeight.toLocaleString("en-US")}</div>
             </div>
             <div className="flex justify-around">
               <div>Общая стоимость :</div>
-              <div className="">{summary.toFixed(2)}</div>
+              <div className="">{summary.toLocaleString("en-US")}</div>
             </div>
             <div className="mt-2">
               <TextField
@@ -143,7 +141,7 @@ const CreateCar = () => {
                 onChange={(evt) => setDestination(evt.target.value)}
               ></TextField>
             </div>
-            <div className="flex justify-around">
+            <div className="flex justify-around items-center">
               <Select
                 placeholder="Поставщик"
                 value={supplier.name}
@@ -174,10 +172,7 @@ const CreateCar = () => {
                     !supp.header.endsWith("D")
                   ) {
                     return (
-                      <MenuItem
-                        key={supp.accessorKey}
-                        value={supp.header}
-                      >
+                      <MenuItem key={supp.accessorKey} value={supp.header}>
                         {supp.header.toUpperCase()}
                       </MenuItem>
                     );
@@ -188,15 +183,17 @@ const CreateCar = () => {
                 placeholder="Позиция"
                 value={selectValue.name}
                 sx={{ minWidth: 120, marginTop: 2 }}
-                onChange={(event) => handleSecondSelected(event)}
+                onChange={(event) => {
+                  handleSecondSelected(event);
+                }}
               >
                 {positions.map((item) => (
                   <MenuItem
-                    key={item.position}
+                    key={item.item}
                     sx={{ display: "flex", justifyContent: "space-around" }}
                     value={item.position}
                   >
-                    {item.position} Цена: {item.price}
+                    {item.position}
                   </MenuItem>
                 ))}
               </Select>
@@ -225,18 +222,22 @@ const CreateCar = () => {
             {items.length > 0 && (
               <div className="max-h-52 overflow-auto">
                 Продукция :
-                {items.map((item, index) => (
-                  <div
-                    key={item.id}
-                    className="flex justify-around border-solid border-2 border-black rounded mt-2 bg-gray-100 text-stone-700"
-                    onDoubleClick={() => handleDelete(index)}
-                  >
-                    <p>{item.name}</p>
-                    <p>{item.position}</p>
-                    <p>{item.price}</p>
-                    <p>{item.quantity}</p>
-                  </div>
-                ))}
+                {items.map((item, index) => {
+                  if (index > 0) {
+                    return (
+                      <div
+                        key={item.id}
+                        className="flex justify-around border-solid border-2 border-black rounded mt-2 bg-gray-100 text-stone-700"
+                        onDoubleClick={() => handleDelete(index)}
+                      >
+                        <p>{item.supplier}</p>
+                        <p>{item.position}</p>
+                        <p>{item.price}</p>
+                        <p>{item.quantity}</p>
+                      </div>
+                    );
+                  }
+                })}
               </div>
             )}
           </div>

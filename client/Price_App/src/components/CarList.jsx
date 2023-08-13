@@ -9,21 +9,33 @@ import axios from "axios";
 const CarList = () => {
   const snap = useSnapshot(state);
   const [carList, setCarList] = useState([]);
+  const [forceUpdateAdd, setForceUpdateAdd] = useState(false);
+  const [forceUpdateDelete, setForceUpdateDelete] = useState(false);
+
+  const handleUpdateAdd = () => setForceUpdateAdd(!forceUpdateAdd);
+  const handleUpdateDelete = () => setForceUpdateDelete(!forceUpdateDelete);
 
   useEffect(() => {
     try {
       axios.get(`${snap.baseUrl}/carList/getList/${snap.id}`).then((res) => {
         state.carList = res.data;
-        setCarList(res.data.reverse())
+        setCarList(res.data.reverse());
       });
     } catch (error) {
       console.log("Error getting car list" + error.message);
     }
-  }, []);
+  }, [forceUpdateAdd, forceUpdateDelete]);
 
-  const handleRomoveItem = (index) => {
+  const handleRomoveItem = async (index) => {
     const updatedItems = carList.filter((_, i) => i !== index);
     state.carList = updatedItems;
+
+    const itemToRemove = carList.filter((_, i) => i === index);
+    const dbItem = { item: itemToRemove };
+    console.log(itemToRemove);
+    await axios.post(`${snap.baseUrl}/${snap.id}/carList/deleteCar`, dbItem);
+
+    handleUpdateDelete();
     // console.log(snap.carList);
   };
 
@@ -31,7 +43,7 @@ const CarList = () => {
   return (
     <div className="bg-gradient-to-b from-gray-900 to-gray-100 py-2 min-h-screen overflow-auto">
       <div className="flex justify-center">
-        <CreateCar />
+        <CreateCar updateCarList={handleUpdateAdd} />
       </div>
       {carList.map((car, index) => (
         <CarCard

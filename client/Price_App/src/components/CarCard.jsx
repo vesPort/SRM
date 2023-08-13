@@ -58,21 +58,21 @@ const CarCard = ({ destination, summary, weight, items, button }) => {
         <div className="max-h-52 overflow-auto">
           Продукция :
           {carItems.map((item, index) => {
+            console.log(item);
+
             return (
-
-                <div
-                  key={index}
-                  className="flex justify-around border-solid border-2 border-black rounded mt-2 bg-gray-100 text-stone-700 hover:bg-gray-400 hover:text-lg"
-                  onDoubleClick={() => handleDelete(index)}
-                >
-                  <>
-                    <p>{item.supplier}</p>
-                    <p>{item.item}</p>
-                    <p>{item.price}</p>
-                    <p>{item.quantity}</p>
-                  </>
-                </div>
-
+              <div
+                key={index}
+                className="flex justify-around border-solid border-2 border-black rounded mt-2 bg-gray-100 text-stone-700 hover:bg-gray-400 hover:text-lg"
+                onDoubleClick={() => handleDelete(index)}
+              >
+                <>
+                  <p>{item.supplier}</p>
+                  <p>{item.position}</p>
+                  <p>{item.price}</p>
+                  <p>{item.quantity}</p>
+                </>
+              </div>
             );
           })}
         </div>

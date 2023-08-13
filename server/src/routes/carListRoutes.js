@@ -10,6 +10,6 @@ router.get("/carList/getList/:id", getCarList);
 
 router.post("/:id/carList/addCar", addCar);
 
-router.delete("/carList/deleteCar", deleteCar);
+router.post("/:id/carList/deleteCar", deleteCar);
 
 export default router;

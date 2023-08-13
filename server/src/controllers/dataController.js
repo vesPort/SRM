@@ -38,7 +38,10 @@ const addPosition = async (req, res) => {
       const newPosition = { position: position, позиции: position };
 
       suppliers.map((supplier) => {
-        if (supplier.accessorKey !== "position" && supplier.accessorKey !== "позиции")
+        if (
+          supplier.accessorKey !== "position" &&
+          supplier.accessorKey !== "позиции"
+        )
           newPosition[`${supplier.accessorKey}`] = 0;
       });
 
@@ -58,21 +61,21 @@ const addPosition = async (req, res) => {
 };
 
 const setPrice = async (req, res) => {
-  const { _id, index, id, value } = req.body;
+  const _id = req.params.id;
+  const { index, id, value } = req.body;
 
   const data = await Data.findById(_id);
 
   const tableData = data.data;
 
-  const position = tableData[index]["position"];
+  const position = tableData[index];
 
-  const positionKeys = Object.keys(position);
 
-  const keyForChange = positionKeys[id];
+  const positionKeys = Object.keys(tableData[index]);
 
-  const updatedPosition = (position[keyForChange] = value);
 
-  console.log(tableData);
+  const updatedPosition = (position[id] = parseFloat(value));
+
 
   const updatedData = await Data.findByIdAndUpdate(
     { _id },

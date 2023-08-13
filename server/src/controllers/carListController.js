@@ -16,9 +16,11 @@ const addCar = async (req, res) => {
   let summary = 0;
   let weight = 0;
 
-  await items.map((item) => {
-    summary += parseFloat(item.price) * parseFloat(item.quantity);
-    weight += parseFloat(item.quantity);
+  await items.map((item, i) => {
+    if (i > 0) {
+      summary += parseFloat(item.price) * parseFloat(item.quantity);
+      weight += parseFloat(item.quantity);
+    }
   });
 
   const newCarList = await Data.findByIdAndUpdate(
@@ -27,8 +29,8 @@ const addCar = async (req, res) => {
       $push: {
         carList: {
           destination: destination,
-          summary: summary,
-          weight: weight,
+          summary: summary.toLocaleString("en-US"),
+          weight: weight.toLocaleString("en-US"),
           items: items,
         },
       },
@@ -40,10 +42,11 @@ const addCar = async (req, res) => {
 };
 
 const deleteCar = async (req, res) => {
-  const { id, item } = req.body;
+  const id = req.params.id;
+  const { item } = req.body;
   const data = await Data.findByIdAndUpdate(
     id,
-    { $pull: { carList: item } },
+    { $pull: { carList: item[0] } },
     { new: true }
   );
 
