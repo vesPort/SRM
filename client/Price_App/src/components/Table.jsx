@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { MaterialReactTable } from "material-react-table";
 import { AddSupplierForm } from "../components/index";
+import CircularProgress from "@mui/material/CircularProgress";
 
 import { useSnapshot } from "valtio";
 import state from "../store";
-import { Button } from "@mui/material";
+import { Button, MenuItem, Select } from "@mui/material";
 import AddPosition from "./AddPosition";
-import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import AddBoxIcon from "@mui/icons-material/AddBox";
 import axios from "axios";
 
 const Table = () => {
@@ -16,19 +17,38 @@ const Table = () => {
   const [suppliers, setSuppliers] = useState([]);
   const [forceUpdateSupplier, setForceUpdateSupplier] = useState(false);
   const [forceUpdatePosition, setForceUpdatePosition] = useState(false);
+  const [forceUpdateNewTAble, setForceUpdateNewTable] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
+  const [tablesId, setTablesId] = useState([]);
 
   // const suppliers = state.suppliers;
   // console.log({suppliers})
   const handleUpdateTableSupplier = () => {
+    setIsFetching(true);
     setForceUpdateSupplier(!forceUpdateSupplier);
+    setIsFetching(false);
   };
 
   const handleUpdateTablePosition = () => {
+    setIsFetching(true);
     setForceUpdatePosition(!forceUpdatePosition);
+    setIsFetching(false);
+  };
+
+  const handleCreateTable = async () => {
+    setIsFetching(true);
+
+    await axios
+      .post(`${snap.baseUrl}/${snap.id}/data/newDoc`)
+      .then((res) => (state.id = res.data.newId));
+
+    setForceUpdateNewTable(!forceUpdateNewTAble);
+    setIsFetching(false);
   };
 
   useEffect(() => {
     const fetchData = async () => {
+      const ids = await axios.get(`${snap.baseUrl}/data/idList`);
       const dataResponse = await axios.get(`${snap.baseUrl}/data/${snap.id}`);
       const suppliersResponce = await axios.get(
         `${snap.baseUrl}/${snap.id}/getSuppliers`
@@ -39,12 +59,21 @@ const Table = () => {
 
       setTableData(dataResponse.data);
       setSuppliers(suppliersResponce.data);
+      setTablesId(ids.data.ids);
     };
 
-    console.log("sup lag");
+    console.log(tablesId);
 
+    setIsFetching(true);
     fetchData();
-  }, [forceUpdateSupplier, forceUpdatePosition]);
+    setIsFetching(false);
+  }, [
+    forceUpdateSupplier,
+    forceUpdatePosition,
+    forceUpdateNewTAble,
+    isFetching,
+    snap.id,
+  ]);
 
   const handleSaveCell = async (cell, value) => {
     state.data[cell.row.index][cell.column.id] = value;
@@ -56,10 +85,14 @@ const Table = () => {
       value: value,
     };
 
+    setIsFetching(true);
     await axios.post(
       `${snap.baseUrl}/data/${snap.id}/setPrice`,
       setPriceToCell
     );
+
+    setIsFetching(false);
+
     // setTableData(tableData[cell.row.index][cell.column.id] = value);
     //send/receive api updates here
   };
@@ -70,7 +103,11 @@ const Table = () => {
     state.data.splice(row.index, 1);
   };
 
-  return (
+  return isFetching ? (
+    <div className="flex justify-center items-center min-h-screen">
+      <CircularProgress sx={{ color: "red" }} />
+    </div>
+  ) : (
     <div className="min-h-screen bg-gradient-to-tl from-gray-900 to-gray-100 ">
       <div className="flex justify-around">
         {snap.addingSupplier && (
@@ -127,14 +164,58 @@ const Table = () => {
               >
                 Добавить позицию
               </Button>
+              <Button
+                sx={{
+                  marginLeft: 2,
+                  color: "black",
+                  bgcolor: "white",
+                  ":hover": {
+                    background:
+                      "linear-gradient(to right bottom, #430089, #82ffa1)",
+                    color: "white",
+                  },
+                }}
+                variant="contained"
+                onClick={() => handleCreateTable()}
+              >
+                <AddBoxIcon sx={{ mr: 2 }} />
+                Создать таблицу
+              </Button>
+            </div>
+          )}
+          muiBottomToolbarProps={{
+            sx: { flex: "flex", justifyContent: "end" },
+          }}
+          renderBottomToolbarCustomActions={() => (
+            <div className="flex items-center">
+              <Select
+                onChange={(evt) => {
+                  state.id = evt.target.value;
+                }}
+              >
+                {tablesId.map((id, i) => {
+                  const menuItemHeaders = [
+                    "Сегодня",
+                    "Прошлая неделя",
+                    "2 недели назад",
+                    "3 недели назад",
+                  ];
+
+                  return (
+                    <MenuItem key={id} value={id}>
+                      {menuItemHeaders[i]}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
             </div>
           )}
           data={tableData}
           columns={suppliers.map((data) => data)}
           enableStickyHeader
-          enableBottomToolbar={false}
+          enableBottomToolbar={true}
           muiTableContainerProps={{
-            sx: { minHeight: "94vh", maxHeight: "94vh" },
+            sx: { minHeight: "82vh", maxHeight: "82vh" },
           }}
           defaultColumn={{ size: 100, maxSize: 100 }}
           enableEditing

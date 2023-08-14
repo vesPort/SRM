@@ -68,7 +68,7 @@ const CarCard = ({ destination, summary, weight, items, button }) => {
               >
                 <>
                   <p>{item.supplier}</p>
-                  <p>{item.position}</p>
+                  <p>{item.position || item.item}</p>
                   <p>{item.price}</p>
                   <p>{item.quantity}</p>
                 </>

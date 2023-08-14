@@ -1,5 +1,4 @@
 import { proxy } from "valtio";
-import data from "../moch_data";
 
 const state = proxy({
   carList: [],
@@ -8,7 +7,7 @@ const state = proxy({
   addingPosition: false,
   suppliers: [{ header: "Позиции", accessorKey: "position" }],
   baseUrl: "http://localhost:3000",
-  id: "64d3917bd67eb63ca611a7e8",
+  id: "64d9f9f62e541b92fad7e470",
 });
 
 export default state;

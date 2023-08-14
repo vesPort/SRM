@@ -5,26 +5,32 @@ import CarCard from "./CarCard";
 import { Button } from "@mui/material";
 import { CreateCar } from "../components/index";
 import axios from "axios";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const CarList = () => {
   const snap = useSnapshot(state);
   const [carList, setCarList] = useState([]);
   const [forceUpdateAdd, setForceUpdateAdd] = useState(false);
   const [forceUpdateDelete, setForceUpdateDelete] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
 
   const handleUpdateAdd = () => setForceUpdateAdd(!forceUpdateAdd);
   const handleUpdateDelete = () => setForceUpdateDelete(!forceUpdateDelete);
 
   useEffect(() => {
     try {
+      setIsFetching(true);
+
       axios.get(`${snap.baseUrl}/carList/getList/${snap.id}`).then((res) => {
         state.carList = res.data;
         setCarList(res.data.reverse());
       });
+
+      setIsFetching(false);
     } catch (error) {
       console.log("Error getting car list" + error.message);
     }
-  }, [forceUpdateAdd, forceUpdateDelete]);
+  }, [forceUpdateAdd, forceUpdateDelete, snap.id]);
 
   const handleRomoveItem = async (index) => {
     const updatedItems = carList.filter((_, i) => i !== index);
@@ -45,33 +51,35 @@ const CarList = () => {
       <div className="flex justify-center">
         <CreateCar updateCarList={handleUpdateAdd} />
       </div>
-      {carList.map((car, index) => (
-        <CarCard
-          key={index}
-          id={car.id}
-          destination={car.destination}
-          summary={car.summary}
-          weight={car.weight}
-          items={car.items}
-          showItems={car.showItems}
-          position={car.position}
-          button={
-            <Button
-              sx={{
-                background: "linear-gradient(to right, red, gray)",
-                color: "white",
-                minWidth: "90%",
-                "&:hover": {
-                  background: "red",
-                },
-              }}
-              onClick={() => handleRomoveItem(index)}
-            >
-              Удалить
-            </Button>
-          }
-        />
-      ))}
+      {isFetching && <CircularProgress />}
+      {!isFetching &&
+        carList.map((car, index) => (
+          <CarCard
+            key={index}
+            id={car.id}
+            destination={car.destination}
+            summary={car.summary}
+            weight={car.weight}
+            items={car.items}
+            showItems={car.showItems}
+            position={car.position}
+            button={
+              <Button
+                sx={{
+                  background: "linear-gradient(to right, red, gray)",
+                  color: "white",
+                  minWidth: "90%",
+                  "&:hover": {
+                    background: "red",
+                  },
+                }}
+                onClick={() => handleRomoveItem(index)}
+              >
+                Удалить
+              </Button>
+            }
+          />
+        ))}
     </div>
   );
 };
