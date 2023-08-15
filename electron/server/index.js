@@ -45,7 +45,7 @@ const createNewMongoDb = async () => {
 // createNewMongoDb();
 
 mongoose
-  .connect("mongodb+srv://vesyport:ewwe3223@price.83daey0.mongodb.net/SRM")
+  .connect("mongodb+srv://**@price.83daey0.mongodb.net/SRM")
   .then({
     useNewUrlParser: true,
     useUnifiedTopology: true,
